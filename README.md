@@ -1,30 +1,75 @@
 # Employee Management System API
 
-A production-style Employee Management System built with FastAPI.
+## Phase 5 - Authentication and Authorization
 
-## Phase 3 - Project Setup
+This phase adds:
 
-Current foundation includes:
+- JWT access-token authentication
+- Secure password hashing with Argon2
+- OAuth2 password flow for Swagger
+- Current-user endpoint
+- Role-aware dependency
+- MySQL Docker Compose environment
+- Default role seeding script
 
-- FastAPI application
-- Versioned API structure (`/api/v1`)
-- Application configuration using Pydantic Settings
-- Health endpoint
-- System information endpoint
-- Layered package structure ready for database, services, repositories, schemas, and models
+## Start MySQL and API
 
-## Run locally
+```powershell
+docker compose up -d mysql
+```
+
+Create `.env` from `.env.example` and verify `DATABASE_URL`.
+
+Install dependencies:
 
 ```powershell
 pip install -r requirements.txt
+```
+
+Run the Phase 4 migration:
+
+```powershell
+alembic upgrade head
+```
+
+Seed default roles:
+
+```powershell
+python -m scripts.seed_roles
+```
+
+Start the API:
+
+```powershell
 uvicorn app.main:app --reload
 ```
 
+## Authentication
+
 Open:
 
-- http://127.0.0.1:8000
-- http://127.0.0.1:8000/health
-- http://127.0.0.1:8000/api/v1/system/info
-- http://127.0.0.1:8000/docs
+```text
+http://127.0.0.1:8000/docs
+```
 
-Database implementation starts in Phase 4.
+The login endpoint is:
+
+```text
+POST /api/v1/auth/login
+```
+
+It expects OAuth2 form fields:
+
+- username = email
+- password = password
+
+Then use the returned bearer token with:
+
+```text
+GET /api/v1/auth/me
+```
+
+## Important
+
+Do not commit `.env`, database passwords, or production JWT secrets.
+The Docker Compose credentials are development-only placeholders and must be changed for real deployment.

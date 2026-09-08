@@ -1,0 +1,36 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: employee-management-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: employee_management
+      MYSQL_USER: employee_app
+      MYSQL_PASSWORD: change_me
+      MYSQL_ROOT_PASSWORD: root_change_me
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    container_name: employee-management-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql+pymysql://employee_app:change_me@mysql:3306/employee_management
+      SECRET_KEY: change-this-in-development
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
