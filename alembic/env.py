@@ -5,7 +5,14 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import settings
 from app.db.base import Base
-from app import models  # noqa: F401
+from app import models  # noqa: F401from app.db.base import Base
+
+from app.models.department import Department  # noqa: F401
+from app.models.role import Role  # noqa: F401
+from app.models.user import User  # noqa: F401
+from app.models.employee import Employee  # noqa: F401
+from app.models.attendance import Attendance  # noqa: F401
+
 
 
 config = context.config
