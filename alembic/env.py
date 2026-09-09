@@ -12,7 +12,7 @@ from app.models.role import Role  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.models.employee import Employee  # noqa: F401
 from app.models.attendance import Attendance  # noqa: F401
-
+from app.models.leave import Leave
 
 
 config = context.config

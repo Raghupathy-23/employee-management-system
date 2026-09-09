@@ -1,0 +1,4 @@
+# Phase 7.5 integration note
+# Add these fields to the existing Leave model:
+# approver_user_id: nullable FK to users.id
+# approval_comment: nullable Text
