@@ -48,21 +48,51 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    print("LOGIN: request received", flush=True)
+    print(f"LOGIN: email = {form_data.username}", flush=True)
+
     user = db.scalar(
         select(User).where(User.email == form_data.username)
     )
 
-    if user is None or not verify_password(form_data.password, user.password_hash):
+    print(f"LOGIN: user = {user}", flush=True)
+
+    if user is None:
+        print("LOGIN ERROR: user not found", flush=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    print(f"LOGIN: user id = {user.id}", flush=True)
+    print(f"LOGIN: role_id = {user.role_id}", flush=True)
+    print(f"LOGIN: password hash exists = {bool(user.password_hash)}", flush=True)
+
+    password_valid = verify_password(
+        form_data.password,
+        user.password_hash,
+    )
+
+    print(f"LOGIN: password valid = {password_valid}", flush=True)
+
+    if not password_valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    print("LOGIN: password verified", flush=True)
+
+    print(f"LOGIN: role = {user.role}", flush=True)
+
     token = create_access_token(
         subject=str(user.id),
         role=user.role.name,
     )
+
+    print("LOGIN: token created", flush=True)
 
     return {
         "access_token": token,
