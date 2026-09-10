@@ -13,42 +13,90 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
+
+        {/* Brand */}
         <div className="brand">
           <div className="brand-mark">EM</div>
+
           <div>
             <strong>Employee</strong>
             <span>Management</span>
           </div>
         </div>
 
+        {/* Navigation */}
         <nav className="nav-list">
+
           <NavLink to="/dashboard" className="nav-link">
             Dashboard
           </NavLink>
+
+          <NavLink to="/departments" className="nav-link">
+            Departments
+          </NavLink>
+
+          <NavLink to="/employees" className="nav-link">
+            Employees
+          </NavLink>
+
+          <NavLink to="/attendance" className="nav-link">
+            Attendance
+          </NavLink>
+
+          <NavLink to="/leaves" className="nav-link">
+            Leave
+          </NavLink>
+
+          {/* Admin only */}
+          {user?.role === "ADMIN" && (
+            <NavLink to="/roles" className="nav-link">
+              Roles
+            </NavLink>
+          )}
+
         </nav>
 
-        <button className="logout-button" onClick={handleLogout}>
+        {/* Logout */}
+        <button
+          className="logout-button"
+          onClick={handleLogout}
+        >
           Logout
         </button>
+
       </aside>
 
+      {/* Main content */}
       <main className="main-content">
+
         <header className="topbar">
           <div>
-            <p className="eyebrow">Employee Management System</p>
+            <p className="eyebrow">
+              Employee Management System
+            </p>
+
             <h1>Dashboard</h1>
           </div>
+
           <div className="user-chip">
+
             <span className="avatar">
-              {(user?.email || "U").charAt(0).toUpperCase()}
+              {(user?.email || "U")
+                .charAt(0)
+                .toUpperCase()}
             </span>
-            <span>{user?.email || "User"}</span>
+
+            <span>
+              {user?.email || "User"}
+            </span>
+
           </div>
         </header>
 
         <section className="page-content">
           <Outlet />
         </section>
+
       </main>
     </div>
   );
