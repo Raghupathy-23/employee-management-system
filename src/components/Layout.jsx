@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { logout } from "../services/auth";
+import NotificationBell from "./NotificationBell";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -47,6 +48,10 @@ export default function Layout() {
             Leave
           </NavLink>
 
+          <NavLink to="/notifications" className="nav-link">
+            Notifications
+          </NavLink>
+
           {/* Admin only */}
           {user?.role === "ADMIN" && (
             <NavLink to="/roles" className="nav-link">
@@ -70,6 +75,7 @@ export default function Layout() {
       <main className="main-content">
 
         <header className="topbar">
+
           <div>
             <p className="eyebrow">
               Employee Management System
@@ -78,19 +84,26 @@ export default function Layout() {
             <h1>Dashboard</h1>
           </div>
 
-          <div className="user-chip">
+          <div className="topbar-actions">
 
-            <span className="avatar">
-              {(user?.email || "U")
-                .charAt(0)
-                .toUpperCase()}
-            </span>
+            <NotificationBell />
 
-            <span>
-              {user?.email || "User"}
-            </span>
+            <div className="user-chip">
+
+              <span className="avatar">
+                {(user?.email || "U")
+                  .charAt(0)
+                  .toUpperCase()}
+              </span>
+
+              <span>
+                {user?.email || "User"}
+              </span>
+
+            </div>
 
           </div>
+
         </header>
 
         <section className="page-content">

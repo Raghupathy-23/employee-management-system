@@ -7,6 +7,7 @@ import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
 import Leaves from "./pages/Leaves";
 import Roles from "./pages/Roles";
+import Notifications from "./pages/Notifications";
 
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -56,6 +57,8 @@ export default function App() {
             path="/roles"
             element={<Roles />}
           />
+          <Route path="/notifications" 
+          element={<Notifications />} />
 
         </Route>
       </Route>
@@ -65,6 +68,7 @@ export default function App() {
         path="*"
         element={<Navigate to="/dashboard" replace />}
       />
+      
 
     </Routes>
   );
