@@ -1,136 +1,260 @@
-# Employee Management & HR Workflow System
+# Employee Management System
 
-A production-style full-stack employee management application built to demonstrate practical **Python/FastAPI backend engineering**, relational database design, authentication, authorization, testing, Docker and frontend integration.
+A full-stack **Employee Management System** built as a Python/FastAPI learning and portfolio project.
 
-> **Portfolio project:** designed and implemented as a realistic HR operations system rather than a basic CRUD demo.
+The project was developed to practice and demonstrate real-world backend engineering concepts including REST API development, layered architecture, authentication, role-based access control, relational database design, database migrations, business logic, testing, Docker, CI, and frontend integration.
 
-## Live demo
+> **Project status:** Local development / portfolio project
+> **Deployment:** Not currently deployed as a public live application
 
-**Status:** deployment-ready. A public URL is intentionally not committed because production credentials and infrastructure are environment-specific.
+---
 
-When deployed, place the frontend and API URLs here:
+## 📌 Project Overview
 
-- **Web app:** `<YOUR_FRONTEND_URL>`
-- **API:** `<YOUR_API_URL>`
-- **Swagger UI:** `<YOUR_API_URL>/docs`
+The Employee Management System provides a centralized application for managing employee-related information and common employee operations.
 
-## What the project demonstrates
+The system includes:
 
-- REST API development with FastAPI
-- Layered architecture: API → service → repository → SQLAlchemy ORM
-- MySQL 8.4 and Alembic schema migrations
-- JWT authentication with Argon2 password hashing
-- Role-based access control (ADMIN, HR, HR_MANAGER, MANAGER, EMPLOYEE)
-- Employee and department management
-- Manager/direct-report relationships
-- Attendance tracking with duplicate-date protection
-- Leave requests, balance validation and manager/HR approval workflow
-- Persistent in-app notifications with unread/read state
-- Audit logging for important administrative operations
-- Pagination, filtering and validation
-- React frontend integrated with the REST API
-- Docker Compose development environment
-- CI pipeline for linting, backend tests and frontend builds
+* Employee management
+* Department management
+* Role and permission management
+* JWT authentication
+* Role-based access control
+* Attendance tracking
+* Leave management
+* Leave approval
+* Leave balance management
+* Notifications
+* Audit logging
+* REST APIs
+* React frontend
+* MySQL database
+* Database migrations using Alembic
+* Automated testing
+* Docker-based local development
+* GitHub Actions CI
 
-## Architecture
+The project was developed incrementally using feature branches and multiple development phases.
 
-```mermaid
-flowchart TD
-    A[React Frontend] -->|REST / JSON| B[FastAPI API]
-    B --> C[API / Dependency Layer]
-    C --> D[Service Layer]
-    D --> E[Repository Layer]
-    E --> F[SQLAlchemy ORM]
-    F --> G[(MySQL 8.4)]
-    B --> H[JWT Authentication + RBAC]
-    D --> I[Audit Logging]
-    D --> J[Notification Service]
-```
+---
 
-### Backend request flow
+## 🎯 Project Objectives
 
-```text
-HTTP Request
-    ↓
-FastAPI Router
-    ↓
-Authentication / Authorization
-    ↓
-Service Layer (business rules)
-    ↓
-Repository Layer (data access)
-    ↓
-SQLAlchemy
-    ↓
-MySQL
-```
+The main objective of this project was to build a practical full-stack application while developing stronger skills in **Python backend development and API engineering**.
 
-This separation keeps HTTP concerns, business rules and persistence logic independently testable and maintainable.
+The project focuses on:
 
-## Core workflows
+* Building REST APIs using FastAPI
+* Designing a maintainable backend architecture
+* Implementing authentication and authorization
+* Working with relational databases
+* Using SQLAlchemy for database access
+* Managing database changes with Alembic
+* Separating API, business logic, and database responsibilities
+* Implementing employee-related business operations
+* Writing automated tests
+* Containerizing the application with Docker
+* Integrating a React frontend with a FastAPI backend
+* Setting up CI using GitHub Actions
 
-### Leave approval
+---
+
+## ✨ Main Features
+
+### 🔐 Authentication
+
+* JWT-based user authentication
+* Secure password hashing using Argon2
+* Protected API endpoints
+* Configurable application secret through environment variables
+
+### 👥 Employee Management
+
+* Create employees
+* Update employee information
+* Retrieve employee information
+* Manage employee relationships
+* Assign employees to departments
+* Associate employees with managers
+* Support manager/direct-report relationships
+
+### 🏢 Department Management
+
+* Create departments
+* Update departments
+* Retrieve department information
+* Associate employees with departments
+
+### 🛡️ Role-Based Access Control
+
+The application supports multiple roles:
+
+* `ADMIN`
+* `HR`
+* `HR_MANAGER`
+* `MANAGER`
+* `EMPLOYEE`
+
+Access to protected operations is controlled on the backend based on the authenticated user's role.
+
+### 📅 Attendance Management
+
+* Record employee attendance
+* Track attendance dates
+* Store check-in and check-out information
+* Prevent duplicate attendance records for the same employee/date
+* Retrieve attendance information through API endpoints
+
+### 📝 Leave Management
+
+The system provides leave request and approval functionality.
 
 ```text
 Employee submits leave
         ↓
-Balance + date-overlap validation
+Balance validation
         ↓
-PENDING
+Date / overlap validation
         ↓
-Manager / HR reviews
+Pending
         ↓
-APPROVED or REJECTED
+Manager / HR review
         ↓
-Audit log + notification
+Approved / Rejected
+        ↓
+Notification + Audit Log
 ```
 
-### Access control
+Implemented functionality includes:
 
-| Capability | ADMIN | HR | HR_MANAGER | MANAGER | EMPLOYEE |
-|---|:---:|:---:|:---:|:---:|:---:|
-| View own profile/data | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Manage employees | ✓ | ✓ | ✓ | — | — |
-| Manage departments | ✓ | ✓ | ✓ | — | — |
-| Manage roles | ✓ | — | — | — | — |
-| Review direct-report leave | ✓ | ✓ | ✓ | ✓ | — |
-| Submit own leave | ✓ | ✓ | ✓ | ✓ | ✓ |
-| View audit logs | ✓ | ✓ | ✓ | — | — |
+* Leave requests
+* Leave balance validation
+* Date validation
+* Overlapping leave validation
+* Leave approval/rejection
+* Manager/HR review
+* Leave balance handling
 
-Server-side authorization is enforced independently of the frontend UI.
+### 🔔 Notifications
 
-## Technology stack
+The application includes persistent in-app notifications.
+
+Features include:
+
+* Notification creation
+* Read/unread status
+* Notification retrieval
+* Notifications triggered by relevant application operations
+
+### 📋 Audit Logging
+
+Important application operations can be recorded using audit logs.
+
+This provides a record of significant actions performed within the system.
+
+### 🔎 Validation, Pagination & Filtering
+
+The API uses Pydantic schemas for request and response validation.
+
+Selected API resources also support pagination and filtering to handle larger datasets more efficiently.
+
+---
+
+## 🏗️ Architecture
+
+The backend follows a layered architecture:
+
+```text
+React Frontend
+      │
+      ▼
+FastAPI Router
+      │
+      ▼
+Authentication / Authorization
+      │
+      ▼
+Service Layer
+      │
+      ▼
+Repository Layer
+      │
+      ▼
+SQLAlchemy
+      │
+      ▼
+MySQL
+```
+
+### Architecture Responsibilities
+
+**API Layer**
+
+Handles HTTP requests, routing, dependencies and API responses.
+
+**Service Layer**
+
+Contains application and business logic.
+
+**Repository Layer**
+
+Handles database access and isolates persistence logic from the service layer.
+
+**Models**
+
+Represent database entities using SQLAlchemy.
+
+**Schemas**
+
+Define and validate API request and response structures using Pydantic.
+
+This separation keeps the application organized and makes individual components easier to test and maintain.
+
+---
+
+## 🛠️ Technology Stack
 
 ### Backend
 
-- Python 3.12
-- FastAPI
-- SQLAlchemy 2.x
-- Pydantic v2 / pydantic-settings
-- MySQL 8.4
-- Alembic
-- JWT (`python-jose`)
-- Argon2 password hashing (`pwdlib`)
-- Pytest + HTTPX
+* Python 3.12
+* FastAPI
+* SQLAlchemy 2.x
+* Pydantic v2
+* pydantic-settings
+* MySQL 8.4
+* Alembic
+* JWT authentication
+* Argon2 password hashing
+* Pytest
+* HTTPX
 
 ### Frontend
 
-- React 19
-- React Router
-- Axios
-- Vite
-- Nginx for production-style static serving
+* React
+* React Router
+* Axios
+* Vite
+* JavaScript
+* HTML
+* CSS
 
-### DevOps
+### Development & DevOps
 
-- Docker / Docker Compose
-- GitHub Actions
-- Ruff
+* Docker
+* Docker Compose
+* Git
+* GitHub
+* GitHub Actions
+* Ruff
+* Nginx
 
-## Project structure
+---
+
+## 📁 Project Structure
 
 ```text
-.
+employee-management-system/
+│
 ├── app/
 │   ├── api/
 │   │   ├── deps.py
@@ -146,11 +270,8 @@ Server-side authorization is enforced independently of the frontend UI.
 │   │       ├── roles.py
 │   │       ├── audit.py
 │   │       └── router.py
+│   │
 │   ├── core/
-│   │   ├── config.py
-│   │   ├── security.py
-│   │   ├── exceptions.py
-│   │   └── logging.py
 │   ├── db/
 │   ├── middleware/
 │   ├── models/
@@ -158,170 +279,379 @@ Server-side authorization is enforced independently of the frontend UI.
 │   ├── schemas/
 │   ├── services/
 │   └── main.py
+│
 ├── alembic/
 │   └── versions/
+│
 ├── src/
 │   ├── components/
 │   ├── pages/
 │   └── services/
+│
 ├── tests/
 ├── docs/
 ├── docker/
-├── .github/workflows/ci.yml
+├── scripts/
+├── employee-management-demo-data/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
 ├── Dockerfile
 ├── Dockerfile.frontend
 ├── docker-compose.yml
 ├── nginx.conf
 ├── requirements.txt
-├── package.json
 ├── pyproject.toml
-└── .env.example
+├── package.json
+├── .env.example
+├── .gitignore
+└── LICENSE
 ```
 
-## Running locally
+---
 
-### Option A — Docker Compose (recommended)
+## 🐳 Running Locally
 
-1. Copy `.env.example` to `.env`.
-2. Change `SECRET_KEY` to a long random value.
-3. Start the complete stack:
+This project is currently intended for **local development and learning**.
+
+### Prerequisites
+
+* Python 3.12+
+* Node.js
+* npm
+* Docker Desktop
+* Git
+
+### Using Docker Compose
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Raghupathy16/employee-management-system.git
+```
+
+Navigate into the project:
+
+```bash
+cd employee-management-system
+```
+
+Create the environment file.
+
+On Windows PowerShell:
 
 ```powershell
+Copy-Item .env.example .env
+```
+
+Update the required values in `.env`.
+
+Start the application:
+
+```bash
 docker compose up --build -d
 ```
 
-4. Check services:
+Check the containers:
 
-```powershell
+```bash
 docker compose ps
 ```
 
-5. Open:
+### Local URLs
 
 ```text
-Frontend: http://localhost:5174
-API:      http://localhost:8000
-Swagger:  http://localhost:8000/docs
-Health:   http://localhost:8000/health
+Frontend:
+http://localhost:5174
+
+Backend:
+http://localhost:8000
+
+Swagger:
+http://localhost:8000/docs
+
+Health:
+http://localhost:8000/health
 ```
 
-The API container runs `alembic upgrade head` and idempotently seeds the default roles before starting the server.
+> These URLs are for local development only. There is currently no public live deployment.
 
-### Option B — Backend locally + MySQL in Docker
+---
 
-```powershell
-docker compose up -d mysql
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-alembic upgrade head
-python scripts/seed_roles.py
-python create_admin.py --email admin@example.com
-uvicorn app.main:app --reload
-```
+## 🧪 Testing
 
-For the frontend:
+The backend includes automated tests using Pytest.
 
-```powershell
-npm ci
-npm run dev -- --host 0.0.0.0
-```
+Run:
 
-## Demo data
-
-The `employee-management-demo-data/` directory contains additive portfolio data for demonstrating employees, departments, attendance, leave states, notifications and audit history.
-
-**Do not use the included demo credentials or data in production.**
-
-## Testing
-
-The test suite is intentionally independent of a developer's local MySQL installation. API smoke tests use SQLite through the test configuration, while the application itself remains configured for MySQL in normal environments.
-
-```powershell
-pip install -r requirements.txt
+```bash
 pytest
 ```
 
-Run linting:
+The test suite covers areas including:
 
-```powershell
-pip install ruff
+* Health checks
+* Schema validation
+* RBAC routes
+* Security functionality
+* Leave-related validation
+
+### Linting
+
+Run Ruff:
+
+```bash
 ruff check app tests scripts
 ```
 
-Run the frontend build:
+### Frontend Build
 
-```powershell
+Install dependencies:
+
+```bash
 npm ci
+```
+
+Build the frontend:
+
+```bash
 npm run build
 ```
 
-CI runs all three checks automatically on pushes and pull requests.
+---
 
-## API documentation
+## 🔄 Continuous Integration
 
-FastAPI exposes interactive documentation at:
+The repository includes a GitHub Actions workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+The CI pipeline performs automated checks including:
+
+* Python code quality checks
+* Backend tests
+* Frontend build
+
+This helps catch issues before changes are merged.
+
+---
+
+## 📖 API Documentation
+
+When running locally, FastAPI provides interactive Swagger documentation at:
 
 ```text
 http://localhost:8000/docs
 ```
 
-The API is versioned under `/api/v1`.
+The API is versioned under:
 
-Main resource groups:
+```text
+/api/v1
+```
 
-- `/auth`
-- `/employees`
-- `/departments`
-- `/attendance`
-- `/leaves`
-- `/roles`
-- `/notifications`
-- `/audit-logs`
-- `/employees/{employee_id}/leave-balance`
-- `/health`
+Main API resources include:
 
-## Security notes
+```text
+/auth
+/employees
+/departments
+/attendance
+/leaves
+/roles
+/notifications
+/audit-logs
+/employees/{employee_id}/leave-balance
+/health
+```
 
-- Passwords are hashed with Argon2; plaintext passwords are never persisted.
-- JWT tokens are signed with a configurable secret.
-- Protected operations use server-side role checks.
-- Employee/manager access is restricted for sensitive workflows.
-- Secrets are supplied through environment variables and `.env` is ignored by Git.
-- Unexpected 500 responses do not expose internal exception details.
-- CORS origins are configurable rather than hard-coded for production.
+---
 
-## Deployment
+## 🗄️ Database & Migrations
 
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for a provider-neutral production deployment checklist and the values that must be configured before publishing a public demo.
+The application uses:
 
-## Engineering decisions
+```text
+MySQL
+  ↓
+SQLAlchemy
+  ↓
+Alembic
+```
 
-### Why FastAPI?
+Database schema changes are managed using Alembic migrations.
 
-FastAPI provides typed request/response schemas, dependency injection, automatic OpenAPI documentation and strong support for building REST APIs quickly while keeping the codebase structured.
+Apply migrations with:
 
-### Why a service/repository split?
+```bash
+alembic upgrade head
+```
 
-The API layer handles HTTP concerns, the service layer owns business rules such as leave balances and approval rules, and repositories isolate database access. This reduces coupling and makes business logic easier to test.
+This allows the database schema to be recreated consistently in a new development environment.
 
-### Why Alembic?
+---
 
-Database changes are version-controlled and reproducible. A new environment can reach the same schema by running `alembic upgrade head`.
+## 🔐 Security
 
-## Future improvements
+The project includes several security-related practices:
 
-- Refresh-token/session management
-- Background job processing for email notifications
-- More granular permissions than role-only authorization
-- Full integration tests against MySQL in CI
-- Structured JSON logging and centralized observability
-- Production secrets manager integration
+* JWT-based authentication
+* Argon2 password hashing
+* Backend-enforced role-based authorization
+* Protected API routes
+* Environment-based configuration
+* Configurable CORS
+* Centralized exception handling
+* `.env` excluded from Git tracking
 
-## Portfolio note
+Sensitive credentials are not intended to be committed to the repository.
 
-This project is intentionally presented as a **production-style learning project**. It demonstrates architecture, security, validation, testing and deployment practices without claiming to be a certified enterprise HR product.
+---
 
-## License
+## 🔀 Development Phases
 
-MIT. See [`LICENSE`](LICENSE).
+The project was developed incrementally using Git feature branches.
+
+The main development stages included:
+
+1. Project setup
+2. Database architecture
+3. Authentication
+4. Employee management
+5. Department management
+6. Attendance management
+7. Frontend integration
+8. Leave management
+9. Leave approval
+10. Leave balance management
+11. Notifications
+12. Role-based access control
+13. Audit logging
+14. Dashboard improvements
+15. Docker integration
+16. Automated testing
+17. GitHub Actions CI
+18. Documentation and code improvements
+
+The complete development history is available through the repository's Git commits and branches.
+
+---
+
+## 📚 Project Documentation
+
+Additional documentation is available in the repository:
+
+* `docs/ARCHITECTURE.md`
+* `docs/DEPLOYMENT.md`
+* `docs/FRONTEND.md`
+* `docs/TESTING.md`
+* `docs/PORTFOLIO.md`
+* `PHASE_PLAN.md`
+* `CHANGELOG.md`
+* `PRODUCTION_READINESS.md`
+
+---
+
+## 🚧 Current Status
+
+### Implemented
+
+* FastAPI backend
+* React frontend
+* MySQL database
+* SQLAlchemy ORM
+* Alembic migrations
+* JWT authentication
+* Argon2 password hashing
+* Role-based access control
+* Employee management
+* Department management
+* Attendance management
+* Leave management
+* Leave approval
+* Leave balance management
+* Notifications
+* Audit logging
+* API validation
+* Pagination/filtering
+* Docker Compose
+* Automated tests
+* GitHub Actions CI
+* Project documentation
+
+### Not Yet Implemented
+
+The following are planned or possible future improvements:
+
+* Public cloud deployment
+* Refresh-token/session management
+* Background job processing
+* Email notification service
+* More granular permission management
+* Full integration testing against MySQL in CI
+* Centralized logging and observability
+* Production secrets management
+* Production monitoring
+
+---
+
+## 🚀 Future Improvements
+
+Possible future improvements include:
+
+* Deploying the application to a cloud platform
+* Implementing refresh-token/session management
+* Adding background jobs
+* Adding email notifications
+* Improving permission granularity
+* Expanding integration test coverage
+* Adding structured logging
+* Adding application monitoring
+* Improving frontend error handling
+* Adding production infrastructure
+
+---
+
+## 📌 Portfolio Note
+
+This project is intentionally presented as a **learning and portfolio project**.
+
+The application has been developed locally to practice full-stack development and backend engineering concepts using FastAPI, React, MySQL, Docker and related technologies.
+
+It is **not currently deployed as a public production application** and is not presented as an enterprise HR product.
+
+The main purpose of this project is to demonstrate practical experience with:
+
+* Python backend development
+* REST API design
+* Database design
+* Authentication and authorization
+* Business logic
+* Testing
+* Docker
+* CI
+* Frontend/backend integration
+* Maintainable project architecture
+
+---
+
+## 👨‍💻 Author
+
+**Raghupathy**
+
+Computer Science & Business Systems
+
+GitHub:
+https://github.com/Raghupathy16
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+See [LICENSE](LICENSE) for details.
