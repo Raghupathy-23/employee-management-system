@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.leave import Leave
 from app.repositories.leave_repository import LeaveRepository
+from app.repositories.employee_repository import EmployeeRepository
 from app.services.leave_balance_service import LeaveBalanceService
 
 
@@ -26,6 +27,10 @@ class LeaveService:
     def __init__(self):
         self.repository = LeaveRepository()
         self.balance_service = LeaveBalanceService()
+        self.employee_repository = EmployeeRepository()
+
+    def get_employee(self, db: Session, employee_id: int):
+        return self.employee_repository.get_by_id(db, employee_id)
 
     def _validate_leave_type(self, leave_type: str):
         normalized = leave_type.upper()
@@ -80,6 +85,7 @@ class LeaveService:
         employee_id=None,
         status=None,
         leave_type=None,
+        manager_id=None,
     ):
         # Validate status
         if status is not None:
@@ -99,6 +105,7 @@ class LeaveService:
             employee_id,
             status,
             leave_type,
+            manager_id,
         )
 
     def get(self, db: Session, leave_id: int):

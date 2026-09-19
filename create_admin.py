@@ -1,38 +1,46 @@
+import argparse
+from getpass import getpass
+
+from sqlalchemy import select
+
 from app.core.security import hash_password
 from app.db.database import SessionLocal
-from app.models.user import User
 from app.models.role import Role
+from app.models.user import User
 
 
-email = "admin@example.com"
-password = "Admin@123"
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Create an administrator account")
+    parser.add_argument("--email", required=True, help="Administrator email address")
+    args = parser.parse_args()
 
-db = SessionLocal()
+    password = getpass("Password: ")
+    confirm = getpass("Confirm password: ")
+    if password != confirm:
+        raise SystemExit("Passwords do not match.")
+    if len(password) < 8:
+        raise SystemExit("Password must contain at least 8 characters.")
 
-try:
-    role = db.query(Role).filter(Role.name == "ADMIN").first()
+    email = args.email.strip().lower()
+    with SessionLocal() as db:
+        role = db.scalar(select(Role).where(Role.name == "ADMIN"))
+        if role is None:
+            raise SystemExit("ADMIN role does not exist. Run: python scripts/seed_roles.py")
 
-    if role is None:
-        raise RuntimeError("ADMIN role does not exist.")
+        existing_user = db.scalar(select(User).where(User.email == email))
+        if existing_user:
+            raise SystemExit(f"User already exists: {email}")
 
-    existing_user = db.query(User).filter(User.email == email).first()
-
-    if existing_user:
-        print(f"User already exists: {email}")
-    else:
         user = User(
             email=email,
             password_hash=hash_password(password),
             role_id=role.id,
             is_active=True,
         )
-
         db.add(user)
         db.commit()
+        print(f"Administrator created: {email}")
 
-        print("Admin user created successfully.")
-        print(f"Email: {email}")
-        print(f"Password: {password}")
 
-finally:
-    db.close()
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,2 @@
+# If app/db/base.py imports models explicitly for Alembic metadata, add:
+from app.models.notification import Notification

@@ -7,4 +7,4 @@ def test_health(api):
 def test_readiness(api):
     response = api.get("/health/readiness")
     assert response.status_code == 200
-    assert response.json()["status"] in {"ready", "not_ready"}
+    assert response.json() == {"status": "ready", "database": "ok"}

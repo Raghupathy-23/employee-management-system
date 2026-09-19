@@ -1,0 +1,5 @@
+# Add this import to app/api/v1/router.py
+from app.api.v1.notifications import router as notifications_router
+
+# Add this after the other router.include_router(...) calls
+router.include_router(notifications_router)

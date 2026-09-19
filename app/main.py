@@ -1,57 +1,57 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import router as api_router
+from app.api.v1.health import router as health_router
+from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
 from app.middleware.request_logging import RequestLoggingMiddleware
 
 
 configure_logging()
+settings.validate_runtime()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    yield
+
 
 app = FastAPI(
     title="Employee Management System API",
-    description="REST API for employee and HR management",
-    version="0.3.0",
+    description=(
+        "Production-style REST API for employee and HR operations, "
+        "including authentication, attendance, leave workflows, audit logs and notifications."
+    ),
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
-# Exception handlers
 register_exception_handlers(app)
-
-# Request logging middleware
 app.add_middleware(RequestLoggingMiddleware)
 
-# API routes
+# Health endpoints stay at the root so container/orchestrator probes do not
+# depend on the versioned API namespace.
+app.include_router(health_router)
 app.include_router(api_router)
 
 
-@app.get("/")
+@app.get("/", tags=["System"])
 def root():
     return {
         "message": "Employee Management System API",
-        "version": "0.3.0",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health",
     }
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
-@app.get("/health/readiness")
-def readiness_check():
-    return {"status": "ready"}

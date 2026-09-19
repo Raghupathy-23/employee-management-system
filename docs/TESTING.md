@@ -1,62 +1,38 @@
-# Phase 9 — Testing starter suite
+# Testing Strategy
 
-The bundle includes focused regression tests for:
-
-- health and readiness endpoints
-- authentication protection
-- pagination helper
-- notification request schema
-- notification authentication boundaries
-- frontend employee lookup limit regression
-
-## Run
-
-From the existing backend project root:
+## Fast feedback
 
 ```powershell
-pytest -q
+pytest
+ruff check app tests scripts
+npm ci
+npm run build
 ```
 
-For only the new notification/regression tests:
+## Current test categories
 
-```powershell
-pytest -q tests/test_notification_schema.py tests/test_notification_api_auth.py tests/test_frontend_cleanup.py
-```
+- Authentication protection
+- Role endpoint protection
+- Health/readiness behavior
+- Notification endpoint protection
+- Notification service contract
+- Schema validation
+- Pagination behavior
+- JWT token validation
+- Frontend/API request-limit regression
 
-## Test order for the full project
+## Test environment
 
-1. Start MySQL/Docker.
-2. Run `alembic upgrade head`.
-3. Start the FastAPI backend.
-4. Run `pytest -q`.
-5. Start the Vite frontend.
-6. Perform the manual smoke checklist below.
+API smoke tests use SQLite so a contributor does not need a local MySQL server just to run the basic suite. Production and Docker configuration continue to use MySQL.
 
-## Manual smoke checklist
+## Future test coverage
 
-### Authentication
-- Login with the development admin account.
-- Refresh the browser and confirm the session remains available.
-- Logout and confirm protected routes redirect to login.
+The next high-value tests should be MySQL integration tests for:
 
-### Employee/HR UI
-- Dashboard loads.
-- Departments loads.
-- Employees loads.
-- Attendance loads employee choices without a `limit > 100` validation error.
-- Leave loads employee choices without a `limit > 100` validation error.
-- Roles is visible to ADMIN only.
-- Leave approve/reject actions respect the frontend role gate and backend authorization.
-
-### Notifications
-- Open the notification bell.
-- Confirm unread count loads.
-- Confirm notification list loads.
-- Mark one notification read.
-- Mark all notifications read.
-- Open `/notifications` and test the unread-only filter.
-- Confirm another user's notification cannot be read through the current user's endpoint.
-
-## Important
-
-The tests are intentionally additive. They do not replace the comprehensive Phase 9 test plan. Full workflow, repository/service, authorization, and coverage tests should be expanded after the application code is integrated and the test database configuration is confirmed.
+- leave balance calculations
+- overlapping leave requests
+- manager-only approval
+- employee ownership boundaries
+- notification persistence
+- audit-log persistence
+- employee/department CRUD transactions

@@ -25,12 +25,12 @@ export async function deleteLeave(id) {
 }
 
 export async function approveLeave(id, approval_comment = "") {
-  const response = await api.patch(`/leaves/${id}/approve`, { approval_comment });
+  const response = await api.patch(`/leaves/${id}/approve`, { comment: approval_comment });
   return response.data;
 }
 
 export async function rejectLeave(id, approval_comment = "") {
-  const response = await api.patch(`/leaves/${id}/reject`, { approval_comment });
+  const response = await api.patch(`/leaves/${id}/reject`, { comment: approval_comment });
   return response.data;
 }
 

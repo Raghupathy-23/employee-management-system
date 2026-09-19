@@ -22,14 +22,16 @@ class Leave(Base):
     status: Mapped[str] = mapped_column(
         String(30), nullable=False, default="PENDING", index=True
     )
+    approver_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
+    approval_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-        nullable=False,
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
 
     employee = relationship("Employee")
+    approver = relationship("User", foreign_keys=[approver_user_id])

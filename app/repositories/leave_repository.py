@@ -36,6 +36,7 @@ class LeaveRepository:
         employee_id: int | None = None,
         status: str | None = None,
         leave_type: str | None = None,
+        manager_id: int | None = None,
     ):
         stmt = select(Leave).order_by(Leave.start_date.desc(), Leave.id.desc())
 
@@ -45,6 +46,8 @@ class LeaveRepository:
             stmt = stmt.where(Leave.status == status)
         if leave_type is not None:
             stmt = stmt.where(Leave.leave_type == leave_type)
+        if manager_id is not None:
+            stmt = stmt.where(Leave.employee.has(manager_id=manager_id))
 
         return list(db.scalars(stmt.offset(skip).limit(limit)).all())
 

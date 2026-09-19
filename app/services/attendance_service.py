@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.attendance import Attendance
 from app.repositories.attendance_repository import AttendanceRepository
+from app.repositories.employee_repository import EmployeeRepository
 
 
 ALLOWED_STATUSES = {"PRESENT", "ABSENT", "HALF_DAY", "ON_LEAVE"}
@@ -12,8 +13,13 @@ ALLOWED_STATUSES = {"PRESENT", "ABSENT", "HALF_DAY", "ON_LEAVE"}
 class AttendanceService:
     def __init__(self):
         self.repository = AttendanceRepository()
+        self.employee_repository = EmployeeRepository()
+
+    def get_employee(self, db: Session, employee_id: int):
+        return self.employee_repository.get_by_id(db, employee_id)
 
     def create(self, db: Session, data):
+        data.status = data.status.upper()
         if data.status not in ALLOWED_STATUSES:
             raise ValueError(
                 f"Invalid attendance status. Allowed values: "
@@ -43,6 +49,8 @@ class AttendanceService:
         attendance_date: date | None = None,
         status=None,
     ):
+        if status is not None:
+            status = status.upper()
         if status is not None and status not in ALLOWED_STATUSES:
             raise ValueError("Invalid attendance status")
 
@@ -60,8 +68,10 @@ class AttendanceService:
 
         values = data.model_dump(exclude_unset=True)
 
-        if "status" in values and values["status"] not in ALLOWED_STATUSES:
-            raise ValueError("Invalid attendance status")
+        if "status" in values:
+            values["status"] = values["status"].upper()
+            if values["status"] not in ALLOWED_STATUSES:
+                raise ValueError("Invalid attendance status")
 
         new_date = values.get("attendance_date", attendance.attendance_date)
         existing = self.repository.get_by_employee_date(

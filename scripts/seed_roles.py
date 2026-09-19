@@ -7,6 +7,7 @@ from app.models.role import Role
 DEFAULT_ROLES = [
     ("ADMIN", "System administrator"),
     ("HR", "Human resources user"),
+    ("HR_MANAGER", "Human resources manager"),
     ("MANAGER", "Department or team manager"),
     ("EMPLOYEE", "Standard employee"),
 ]

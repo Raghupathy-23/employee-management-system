@@ -5,7 +5,7 @@ It is designed to demonstrate the existing application without changing the sche
 
 ## What it seeds
 
-- Roles: ADMIN, HR, HR_MANAGER, MANAGER, EMPLOYEE
+- Roles: ADMIN, HR, HR_MANAGER, MANAGER, EMPLOYEE (HR_MANAGER is seeded for the demo)
 - Demo users
 - Four departments
 - Six employees with manager relationships

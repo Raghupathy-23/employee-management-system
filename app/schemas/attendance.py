@@ -1,6 +1,9 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+
+ALLOWED_ATTENDANCE_STATUSES = {"PRESENT", "ABSENT", "HALF_DAY", "ON_LEAVE"}
 
 
 class AttendanceBase(BaseModel):
@@ -10,6 +13,15 @@ class AttendanceBase(BaseModel):
     check_out: datetime | None = None
     status: str = Field(default="PRESENT", min_length=2, max_length=30)
     remarks: str | None = Field(default=None, max_length=1000)
+
+    @model_validator(mode="after")
+    def validate_times(self):
+        self.status = self.status.upper()
+        if self.status not in ALLOWED_ATTENDANCE_STATUSES:
+            raise ValueError("Invalid attendance status")
+        if self.check_in and self.check_out and self.check_out < self.check_in:
+            raise ValueError("check_out cannot be earlier than check_in")
+        return self
 
 
 class AttendanceCreate(AttendanceBase):
@@ -23,8 +35,17 @@ class AttendanceUpdate(BaseModel):
     status: str | None = Field(default=None, min_length=2, max_length=30)
     remarks: str | None = Field(default=None, max_length=1000)
 
+    @model_validator(mode="after")
+    def validate_times(self):
+        if self.status is not None:
+            self.status = self.status.upper()
+            if self.status not in ALLOWED_ATTENDANCE_STATUSES:
+                raise ValueError("Invalid attendance status")
+        if self.check_in and self.check_out and self.check_out < self.check_in:
+            raise ValueError("check_out cannot be earlier than check_in")
+        return self
+
 
 class AttendanceResponse(AttendanceBase):
     id: int
-
     model_config = ConfigDict(from_attributes=True)

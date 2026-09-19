@@ -27,10 +27,18 @@ class LeaveUpdate(BaseModel):
     end_date: date | None = None
     reason: str | None = Field(default=None, max_length=1000)
 
+    @model_validator(mode="after")
+    def validate_dates(self):
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValueError("end_date cannot be earlier than start_date")
+        return self
+
 
 class LeaveResponse(LeaveBase):
     id: int
     status: str
+    approver_user_id: int | None = None
+    approval_comment: str | None = None
     created_at: datetime
     updated_at: datetime
 

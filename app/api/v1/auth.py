@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError
@@ -9,11 +11,9 @@ from app.db.database import get_db
 from app.models.user import User
 
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["Authentication"],
-)
+logger = logging.getLogger(__name__)
 
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
@@ -32,12 +32,12 @@ def get_current_user(
         user_id = payload.get("sub")
         if not user_id:
             raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+        user_id = int(user_id)
+    except (JWTError, TypeError, ValueError):
+        raise credentials_exception from None
 
-    user = db.get(User, int(user_id))
-
-    if user is None or not user.is_active:
+    user = db.scalar(select(User).where(User.id == user_id).join(User.role))
+    if user is None or not user.is_active or user.role is None:
         raise credentials_exception
 
     return user
@@ -48,56 +48,25 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    print("LOGIN: request received", flush=True)
-    print(f"LOGIN: email = {form_data.username}", flush=True)
+    email = form_data.username.strip().lower()
+    user = db.scalar(select(User).where(User.email == email))
 
-    user = db.scalar(
-        select(User).where(User.email == form_data.username)
-    )
-
-    print(f"LOGIN: user = {user}", flush=True)
-
-    if user is None:
-        print("LOGIN ERROR: user not found", flush=True)
+    if user is None or not user.is_active or not verify_password(form_data.password, user.password_hash):
+        logger.warning("Failed login attempt for %s", email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    print(f"LOGIN: user id = {user.id}", flush=True)
-    print(f"LOGIN: role_id = {user.role_id}", flush=True)
-    print(f"LOGIN: password hash exists = {bool(user.password_hash)}", flush=True)
+    if user.role is None:
+        logger.error("User %s has no assigned role", user.id)
+        raise HTTPException(status_code=500, detail="User role is not configured")
 
-    password_valid = verify_password(
-        form_data.password,
-        user.password_hash,
-    )
+    token = create_access_token(subject=str(user.id), role=user.role.name)
+    logger.info("Successful login for user_id=%s", user.id)
 
-    print(f"LOGIN: password valid = {password_valid}", flush=True)
-
-    if not password_valid:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    print("LOGIN: password verified", flush=True)
-
-    print(f"LOGIN: role = {user.role}", flush=True)
-
-    token = create_access_token(
-        subject=str(user.id),
-        role=user.role.name,
-    )
-
-    print("LOGIN: token created", flush=True)
-
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-    }
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @router.get("/me")

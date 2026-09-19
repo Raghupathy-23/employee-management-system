@@ -9,6 +9,9 @@ from app.api.v1.leaves import router as leaves_router
 from app.api.v1.leave_approval import router as leave_approval_router
 from app.api.v1.leave_balance import router as leave_balance_router
 from app.api.v1.notifications import router as notifications_router
+from app.api.v1.roles import router as roles_router
+from app.api.v1.audit import router as audit_router
+
 
 router = APIRouter(prefix="/api/v1")
 
@@ -36,3 +39,4 @@ router.include_router(leave_approval_router)
 router.include_router(leave_balance_router)
 
 router.include_router(notifications_router)
+router.include_router(roles_router)
